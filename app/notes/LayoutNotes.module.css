@@ -1,0 +1,20 @@
+.container {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    padding: 24px;
+}
+
+.sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    background-color: #050201;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.content {
+    flex-grow: 1;
+    min-width: 0;
+}
