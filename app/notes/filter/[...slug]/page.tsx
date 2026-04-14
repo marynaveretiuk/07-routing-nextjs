@@ -1,14 +1,20 @@
-"use client";
-
-import { useMemo } from "react";
-import { useParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-
+import {
+  HydrationBoundary,
+  QueryClient,
+  dehydrate,
+} from "@tanstack/react-query";
+import NotesClient from "./Notes.client";
 import { fetchNotes } from "@/lib/api";
-import NoteList from "@/components/NoteList/NoteList";
 
-export default function FilteredNotesPage() {
-  const params = useParams<{ slug: string[] }>();
+interface FilteredNotesPageProps {
+  params: {
+    slug: string[];
+  };
+}
+
+export default async function FilteredNotesPage({
+  params,
+}: FilteredNotesPageProps) {
   const rawTag = params.slug?.[0] ?? "all";
 
   const tag =
@@ -16,40 +22,16 @@ export default function FilteredNotesPage() {
       ? "all"
       : rawTag.charAt(0).toUpperCase() + rawTag.slice(1).toLowerCase();
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["filter-notes", tag],
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery({
+    queryKey: ["notes", "", 1],
     queryFn: () => fetchNotes("", 1),
   });
 
-  const filteredNotes = useMemo(() => {
-    if (!data) return [];
-
-    if (tag === "all") {
-      return data.notes;
-    }
-
-    return data.notes.filter(
-      (note) => note.tag.toLowerCase() === tag.toLowerCase(),
-    );
-  }, [data, tag]);
-
-  if (isLoading) {
-    return <p>Loading, please wait...</p>;
-  }
-
-  if (isError) {
-    return <p>Something went wrong.</p>;
-  }
-
   return (
-    <main>
-      <p>Current tag: {tag}</p>
-
-      {filteredNotes.length > 0 ? (
-        <NoteList notes={filteredNotes} />
-      ) : (
-        <p>No notes found.</p>
-      )}
-    </main>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <NotesClient tag={tag} />
+    </HydrationBoundary>
   );
 }
