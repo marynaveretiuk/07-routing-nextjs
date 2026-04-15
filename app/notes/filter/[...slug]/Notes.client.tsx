@@ -13,10 +13,10 @@ import Modal from "@/components/Modal/Modal";
 import NoteForm from "@/components/NoteForm/NoteForm";
 
 interface NotesClientProps {
-  tag?: string;
+  tag: string;
 }
 
-export default function NotesClient({ tag = "all" }: NotesClientProps) {
+export default function NotesClient({ tag }: NotesClientProps) {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [inputValue, setInputValue] = useState("");
@@ -33,21 +33,17 @@ export default function NotesClient({ tag = "all" }: NotesClientProps) {
   };
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["notes", searchQuery, page],
-    queryFn: () => fetchNotes(searchQuery, page),
+    queryKey: ["notes", searchQuery, tag, page],
+    queryFn: () => fetchNotes(searchQuery, "all", page),
     placeholderData: keepPreviousData,
   });
 
-  const filteredNotes = useMemo(() => {
-    if (!data) return [];
+  const notes = useMemo(() => {
+    const allNotes = data?.notes ?? [];
 
-    if (tag.toLowerCase() === "all") {
-      return data.notes;
-    }
+    if (tag === "all") return allNotes;
 
-    return data.notes.filter(
-      (note) => note.tag.toLowerCase() === tag.toLowerCase(),
-    );
+    return allNotes.filter((note) => note.tag.toLowerCase() === tag);
   }, [data, tag]);
 
   if (isLoading) {
@@ -72,11 +68,7 @@ export default function NotesClient({ tag = "all" }: NotesClientProps) {
         </button>
       </div>
 
-      {filteredNotes.length > 0 ? (
-        <NoteList notes={filteredNotes} />
-      ) : (
-        <p>No notes found.</p>
-      )}
+      {notes.length > 0 ? <NoteList notes={notes} /> : <p>No notes found.</p>}
 
       {data && data.totalPages > 1 && (
         <Pagination

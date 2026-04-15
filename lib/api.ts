@@ -13,8 +13,8 @@ const api = axios.create({
 
 export async function fetchNotes(
   search: string,
+  tag: string,
   page: number,
-  tag?: string,
 ): Promise<FetchNotesResponse> {
   const params: Record<string, string | number> = {
     page,
@@ -24,7 +24,7 @@ export async function fetchNotes(
     params.search = search.trim();
   }
 
-  if (tag && tag !== "all") {
+  if (tag !== "all") {
     params.tag = tag;
   }
 
