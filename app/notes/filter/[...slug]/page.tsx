@@ -14,8 +14,7 @@ interface Props {
 
 export default async function Page({ params }: Props) {
   const { slug } = await params;
-  const rawTag = slug?.[0] ?? "all";
-  const tag = rawTag.toLowerCase();
+  const tag = slug?.[0] ?? "all";
 
   const queryClient = new QueryClient();
 

@@ -1,23 +1,22 @@
 import Link from "next/link";
 import css from "./SidebarNotes.module.css";
-import { noteTags } from "@/lib/tags";
+
+const tags = [
+  { label: "All notes", value: "all" },
+  { label: "Todo", value: "Todo" },
+  { label: "Work", value: "Work" },
+  { label: "Personal", value: "Personal" },
+  { label: "Meeting", value: "Meeting" },
+  { label: "Shopping", value: "Shopping" },
+];
 
 export default function SidebarNotes() {
   return (
     <ul className={css.menuList}>
-      <li className={css.menuItem}>
-        <Link href="/notes/filter/all" className={css.menuLink}>
-          All notes
-        </Link>
-      </li>
-
-      {noteTags.map((tag) => (
-        <li key={tag} className={css.menuItem}>
-          <Link
-            href={`/notes/filter/${tag.toLowerCase()}`}
-            className={css.menuLink}
-          >
-            {tag}
+      {tags.map((tag) => (
+        <li key={tag.value} className={css.menuItem}>
+          <Link href={`/notes/filter/${tag.value}`} className={css.menuLink}>
+            {tag.label}
           </Link>
         </li>
       ))}

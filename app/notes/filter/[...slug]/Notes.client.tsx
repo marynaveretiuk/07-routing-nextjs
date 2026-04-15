@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
@@ -34,17 +34,11 @@ export default function NotesClient({ tag }: NotesClientProps) {
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["notes", searchQuery, tag, page],
-    queryFn: () => fetchNotes(searchQuery, "all", page),
+    queryFn: () => fetchNotes(searchQuery, tag, page),
     placeholderData: keepPreviousData,
   });
 
-  const notes = useMemo(() => {
-    const allNotes = data?.notes ?? [];
-
-    if (tag === "all") return allNotes;
-
-    return allNotes.filter((note) => note.tag.toLowerCase() === tag);
-  }, [data, tag]);
+  const notes = data?.notes ?? [];
 
   if (isLoading) {
     return <p>Loading, please wait...</p>;
